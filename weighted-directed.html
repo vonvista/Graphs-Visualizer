@@ -4,29 +4,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/addons/p5.sound.min.js"></script>
 
-    <title>Title</title>
+    <title>Graph Visualizer</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8" />
     
-    <meta name="description" content="Stack and Queue Visualizer/Simulator web app">
-    <meta name="keywords" content="Stacks, Queues, Visualizer, Algorithms,Data Structures, Simulator">
+    <meta name="description" content="A visualizer web app for Graph Data Structure and algoriths for graphs">
+    <meta name="keywords" content="Graph, DSA, Visualizer, Algorithms, Data Structures, Simulator">
     <meta name="author" content="Von Vista">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   </head>
   <body>
     <div class="controls" style="align-items: center;margin:0px;"> 
-      <h1>Title</h1>
+      <h1>Graph Visualizer</h1>
+      <p class="headerContainer" style="background-color:#29597e">Weighted Directed Graph</p>
       <p class="headerContainer">Created by Von Vista</p>
       <a class="headerContainer" href="https://github.com/VonVista">> Github</a>
-      <a class="headerContainer" href="https://github.com/VonVista/Linked-List">> Project</a>
+      <a class="headerContainer" href="https://github.com/VonVista/Graphs-Visualizer">> Project</a>
     </div>
     <div id="controlPanel" class="controlsParent">
       <div class="controls">
         <button onClick = handleMouse() class = "controlButton">Mouse</button>
         <button onClick = handleAddNode() class = "controlButton">Add Node</button>
         <button onClick = handleAddEdge() class = "controlButton">Add Edge</button>
-        <button onClick = handleRemoveNode() class = "controlButton">Remove Node/Edge</button>
+        <button onClick = handleRemoveNode() class = "controlButton">Remove Node</button>
+        <button onClick = handleRemoveEdge() class = "controlButton">Remove Edge</button>
       </div>
       <div class="controls"> 
         <input type="text" id="queueElement" placeholder="Input string to test"

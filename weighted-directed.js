@@ -44,6 +44,26 @@ class Graph {
     //this.AdjList.get(w).add(v);
   }
 
+  removeEdge(v, w){
+
+    if(edges.has(w.value + "," + v.value)){
+      edges.get(w.value + "," + v.value).edgeType = "straight"
+    }
+
+    this.AdjList.get(v).delete(w);
+  }
+
+  removeNode(v){
+    
+    for (const [key, value] of this.AdjList.entries()) {
+      if(value.has(v)){
+        value.delete(v)
+      }
+    }
+
+    this.AdjList.delete(v);
+  }
+
   draw() {
 
     // for (const [key, value] of this.AdjList.entries()) {
@@ -255,6 +275,11 @@ function handleRemoveNode() {
   statusText = "Remove Node"
 }
 
+function handleRemoveEdge() {
+  clickMode = "removeEdge"
+  statusText = "Remove Edge"
+}
+
 function handleAddEdge() {
   clickMode = "addEdge"
   statusText = "Add Edge"
@@ -363,7 +388,7 @@ function draw() {
   line(startx, starty, endx, endy)
 }
 
-async function mousePressed() {
+function mousePressed() {
   if(mouseButton == LEFT && mouseY > 0){
     if(clickMode == "addNode" && editingMode == false){
       inpButton.mousePressed(nodeValueSet);
@@ -375,7 +400,7 @@ async function mousePressed() {
       inpTarget = newNode
     }
 
-    else if(clickMode == "addEdge"){
+    else if(clickMode == "addEdge" && editingMode == false){
       inpButton.mousePressed(edgeValueSet);
       startx = mouseX
       starty = mouseY
@@ -388,7 +413,43 @@ async function mousePressed() {
         }
       }
     }
-    else if(clickMode == "none"){
+    else if(clickMode == "removeNode" && editingMode == false){
+      let removeNode
+      for (node of nodes) {
+        removeNode = node.clicked()
+        if(removeNode != undefined){
+
+          for (const [nodes, edge] of edges.entries()) {
+            if(edge.end == removeNode){
+              edges.delete(edge.start.value + "," + edge.end.value)
+            }
+          }
+          graph.removeNode(removeNode)
+
+          nodes.delete(removeNode)
+
+          
+
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "removeEdge" && editingMode == false){
+      let removeEdge
+      for (const [nodes, edge] of edges.entries()) {
+        removeEdge = edge.clicked()
+        if(removeEdge != undefined){
+          graph.removeEdge(edge.start, edge.end)
+
+          edges.delete(edge.start.value + "," + edge.end.value)
+          console.log("YES")
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "none" && editingMode == false){
       for(node of nodes){
         selectedNode = node.clicked()
         if(selectedNode != undefined){
@@ -399,19 +460,19 @@ async function mousePressed() {
       }
     }
   }
-  else if(mouseButton == RIGHT){
+  else if(mouseButton == RIGHT && editingMode == false){
     console.log(graph.AdjList)
     console.log(edges)
   }
 }
 
 function mouseDragged(){
-  if(mouseButton == LEFT && mouseY > 0){
+  if(mouseButton == LEFT && mouseY > 0 && editingMode == false){
     if(clickMode == "addEdge"){
       endx = mouseX
       endy = mouseY
     }
-    else if (clickMode == "none"){
+    else if (clickMode == "none" && editingMode == false){
       if(selectedNode != undefined){
         selectedNode.x = mouseX
         selectedNode.y = mouseY
@@ -430,7 +491,8 @@ function mouseReleased(){
       selectedNode.color = [255, 255, 255];
     }
 
-    if(clickMode == "addEdge"){
+    if(clickMode == "addEdge" && editingMode == false){
+
       for(let node of nodes){
         endnode = node.clicked()
         if(endnode != undefined){
@@ -474,6 +536,8 @@ function mouseReleased(){
         else if(lineType == "loop"){
           moveInputField(startnode.x, startnode.y - curveDistance - 10)
         }
+
+        editingMode = true
         
         var newEdge = new Edge(startnode, endnode, lineType)
         inpTarget = newEdge
