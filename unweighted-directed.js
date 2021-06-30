@@ -211,19 +211,21 @@ class Edge {
     triangle(-offset*0.5, offset, offset*0.5, offset, 0, -offset/2); //draws the arrow point as a triangle
     pop();
 
-    textSize(12)
+    //REMOVE TEXT FOR UNWEIGHTED GRAPHS
 
-    //control transition labels
+    // textSize(12)
+
+    // //control transition labels
     
-    if(this.edgeType == "straight"){
-      text(this.value, (this.start.x + this.end.x)/2, (this.start.y + this.end.y)/2 - 20)
-    }
-    else if(this.edgeType == "curve"){
-      text(this.value, midX + distance * (this.start.y-this.end.y), midY + distance * (this.end.x-this.start.x)- 20)
-    }
-    else if(this.edgeType == "loop"){
-      text(this.value, this.start.x, this.start.y - curveDistance - 10)
-    }
+    // if(this.edgeType == "straight"){
+    //   text(this.value, (this.start.x + this.end.x)/2, (this.start.y + this.end.y)/2 - 20)
+    // }
+    // else if(this.edgeType == "curve"){
+    //   text(this.value, midX + distance * (this.start.y-this.end.y), midY + distance * (this.end.x-this.start.x)- 20)
+    // }
+    // else if(this.edgeType == "loop"){
+    //   text(this.value, this.start.x, this.start.y - curveDistance - 10)
+    // }
     
   }
 
@@ -519,29 +521,31 @@ function mouseReleased(){
           lineType = "curve"
         }
 
-        //GET EDGE WEIGHT
-        var midX = (startnode.x + endnode.x)/2
-        var midY = (startnode.y + endnode.y)/2
+        //DISABLED FOR UNWEIGHTED
 
-        var curveDistance = 25
-        var distance = sqrt(pow(startnode.y - endnode.y,2) + pow(endnode.x - startnode.x,2))
-        distance = curveDistance/distance
+        // //GET EDGE WEIGHT
+        // var midX = (startnode.x + endnode.x)/2
+        // var midY = (startnode.y + endnode.y)/2
 
-        //MOVE POSITION
-        if(lineType == "straight"){
-          moveInputField((startnode.x + endnode.x)/2, (startnode.y + endnode.y)/2 - 20)
-        }
-        else if(lineType == "curve"){
-          moveInputField(midX + distance * (startnode.y-endnode.y), midY + distance * (endnode.x-startnode.x)- 20)
-        }
-        else if(lineType == "loop"){
-          moveInputField(startnode.x, startnode.y - curveDistance - 10)
-        }
+        // var curveDistance = 25
+        // var distance = sqrt(pow(startnode.y - endnode.y,2) + pow(endnode.x - startnode.x,2))
+        // distance = curveDistance/distance
 
-        editingMode = true
+        // //MOVE POSITION
+        // if(lineType == "straight"){
+        //   moveInputField((startnode.x + endnode.x)/2, (startnode.y + endnode.y)/2 - 20)
+        // }
+        // else if(lineType == "curve"){
+        //   moveInputField(midX + distance * (startnode.y-endnode.y), midY + distance * (endnode.x-startnode.x)- 20)
+        // }
+        // else if(lineType == "loop"){
+        //   moveInputField(startnode.x, startnode.y - curveDistance - 10)
+        // }
+
+        // editingMode = true
         
         var newEdge = new Edge(startnode, endnode, lineType)
-        inpTarget = newEdge
+        //inpTarget = newEdge
         edges.set(startnode.value + "," + endnode.value, newEdge)
         graph.addEdge(startnode, endnode)
       }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/addons/p5.sound.min.js"></script>
+
+    <title>Graph Visualizer</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+    
+    <meta name="description" content="A visualizer web app for Graph Data Structure and algoriths for graphs">
+    <meta name="keywords" content="Graph, DSA, Visualizer, Algorithms, Data Structures, Simulator">
+    <meta name="author" content="Von Vista">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  </head>
+  <body>
+    <div class="controls" style="align-items: center;margin:0px;"> 
+      <h1>Graph Visualizer</h1>
+      <p class="headerContainer" style="background-color:#29597e">Unweighted Directed Graph</p>
+      <p class="headerContainer">Created by Von Vista</p>
+      <a class="headerContainer" href="https://github.com/VonVista">> Github</a>
+      <a class="headerContainer" href="https://github.com/VonVista/Graphs-Visualizer">> Project</a>
+    </div>
+    <div id="controlPanel" class="controlsParent">
+      <div class="controls">
+        <button onClick = handleMouse() class = "controlButton">Mouse</button>
+        <button onClick = handleAddNode() class = "controlButton">Add Node</button>
+        <button onClick = handleAddEdge() class = "controlButton">Add Edge</button>
+        <button onClick = handleRemoveNode() class = "controlButton">Remove Node</button>
+        <button onClick = handleRemoveEdge() class = "controlButton">Remove Edge</button>
+      </div>
+      <div class="controls"> 
+        <input type="text" id="queueElement" placeholder="Input string to test"
+        class="input_field" style="background-color:#797e29"></input>
+        <button onClick = handleQueue() id="queueButton" style="background-color:#797e29" class = "controlButton">Button</button>
+      </div>
+    </div>
+
+    <script src="unweighted-directed.js"></script>
+    <div id="sketchHolder"></div>
+  </body>
+</html>
