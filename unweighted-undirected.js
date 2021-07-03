@@ -207,6 +207,63 @@ class Graph {
     statusText = "DFS: Click on starting node to start"
   }
 
+  async greedyColoring(startingNode) {
+    var colors = [0,1,2,3,4,5,6,7,8,9]
+    var result = new Map()
+    var usedColors = new Set()
+
+    var colorValues = [[41, 89, 126],[126, 87, 41],[126, 41, 41],[103, 41, 126],4,5,6,7,8,9]
+
+    result[startingNode.value] = colors[0]
+
+    await startingNode.changeFill(colorValues[result[startingNode.value]][0],colorValues[result[startingNode.value]][1],colorValues[result[startingNode.value]][2])
+
+    console.log(startingNode.value)
+    console.log(result[startingNode.value])
+
+    statusText = "Greedy Coloring: Node(" + startingNode.value +") with first color"
+
+    for (const [key, value] of this.AdjList.entries()) {
+      
+      if(key == startingNode){
+        continue
+      }
+
+      console.log("==========")
+      console.log(key.value)
+
+      for (var i of value) { //Loop through adjacent nodes
+        if(!result.has(i.value)){  //Proxy !result
+          
+          usedColors.add(result[i.value])
+        }
+      }
+      console.log(usedColors.size);
+
+      let cr = 0
+      while(true){
+        if(!usedColors.has(cr)){
+          console.log()
+          break
+        }
+        cr += 1
+      }
+            
+      // Assign the found color
+      result[key.value] = colors[cr]
+
+      //await key.changeFill(colors[cr])
+      await key.changeFill(colorValues[cr][0],colorValues[cr][1],colorValues[cr][2])
+
+      console.log(result[key.value])
+
+      usedColors.clear()
+    }
+    
+    console.log(result.size)
+
+  }
+
   draw() {
 
     // for (const [key, value] of this.AdjList.entries()) {
@@ -493,6 +550,12 @@ function handleDFS() {
   resetColors()
 }
 
+function handleGreedyColoring() {
+  clickMode = "greedyColoring"
+  statusText = "Greedy Coloring: Click on starting node to start"
+  resetColors()
+}
+
 function moveInputField(x, y) {
   inp.position(x ,y)
   inpButton.position(x + 80,y)
@@ -603,6 +666,8 @@ function setup() {
   edges.set(newNode1.value + "," + newNode4.value, newEdge)
   graph.addEdge(newNode1, newNode4)
 
+  graph.greedyColoring(newNode1)
+
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
 }
@@ -698,6 +763,18 @@ function mousePressed() {
           console.log("HERE")
           statustext = "DFS: Running"
           graph.dfs(selectedNode)
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "greedyColoring" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statusText = "Greedy Coloring: Running"
+          graph.greedyColoring(selectedNode)
           break
         }
       }
