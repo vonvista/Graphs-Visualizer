@@ -294,6 +294,92 @@ class Graph {
     
   }
 
+  async dijkstraSPT(startingNode) {
+    //let key = new Map()
+    let dist = {}
+    let SPT = []
+    let sptSet = new Set()
+
+    for(let node of nodes){
+      dist[node.value] = Number.MAX_VALUE
+    }
+
+    dist[startingNode.value] = 0
+
+    let min
+    let min_node = startingNode
+
+    //FOR VISUALIZER
+    let minAdj = {}
+
+    for(let i of nodes){
+      min = Number.MAX_VALUE
+      console.log("=============")
+      console.log(dist)
+
+      for(let v of sptSet){
+        
+        for(let adj of this.AdjList.get(v)){
+
+          if(sptSet.has(adj) == false && dist[adj.value] <= min){
+            
+
+            min = dist[adj.value]
+            min_node = adj
+            
+          }
+        }
+        
+      }
+      console.log(min_node)
+      
+      sptSet.add(min_node)
+
+      min_node.label = dist[min_node.value]
+
+      if(min_node != startingNode){
+        await min_node.changeFill(32,98,149)
+      }
+      else {
+        await min_node.changeFill(103, 41, 126)
+      }
+      await min_node.changeOutline(255,157,0)
+
+      console.log(minAdj)
+      if(min_node != startingNode) await minAdj[min_node.value].changeFill(126, 198, 247)
+
+      for(let adj of this.AdjList.get(min_node)){
+
+        if(getEdge(adj, min_node).value != 0 && sptSet.has(adj) == false && 
+        (dist[adj.value] != Number.MAX_VALUE || 
+        dist[min_node.value] + getEdge(adj, min_node).value < dist[adj.value])){
+
+          await getEdge(adj, min_node).changeFill(255,157,0)
+          await adj.changeOutline(255,157,0)
+
+          dist[adj.value] = dist[min_node.value] + getEdge(adj, min_node).value
+          minAdj[adj.value] = getEdge(adj, min_node)
+        }
+      }
+
+    }
+    //DIM OUT NODES THAT ARE NOT PART OF THE MST
+
+    for (const [nodes, edge] of edges.entries()) {
+      console.log(edge.color)
+      if(edge.color[0] == 255 && edge.color[1] == 255 && edge.color[2] == 255){
+        
+        await edge.changeFill(27, 69, 94)
+      }
+      if(edge.color[0] == 255 && edge.color[1] == 157 && edge.color[2] == 0){
+        
+        await edge.changeFill(27, 69, 94)
+      }
+      
+    }
+    
+  }
+
   draw() {
 
     // for (const [key, value] of this.AdjList.entries()) {
@@ -319,6 +405,7 @@ class GraphNode {
     this.size = 50
     this.outlineColor = [255,255,255]
     this.fillColor = [28,42,53]
+    this.label = ""
     
   }
   draw(){
@@ -351,6 +438,13 @@ class GraphNode {
       fill(255, 255, 255);
       textSize(12)
       text(this.value, this.x, this.y)
+    }
+
+    if(this.label != ""){
+      stroke(28, 42, 53)
+      fill(255, 255, 255);
+      textSize(12)
+      text(this.label, this.x, this.y - 35)
     }
   }
   clicked(){
@@ -553,7 +647,6 @@ function handleAddNode() {
   statusText = "Add Node"
 }
 
-
 function handleRemoveNode() {
   clickMode = "removeNode"
   statusText = "Remove Node"
@@ -593,6 +686,12 @@ function handlePrimMST() {
   resetColors()
 }
 
+function handleDijkstraSPT() {
+  clickMode = "dijkstraSPT"
+  statusText = "Shortest Path Tree (Dijkstra): Click on starting node to start"
+  resetColors()
+}
+
 function moveInputField(x, y) {
   inp.position(x ,y)
   inpButton.position(x + 80,y)
@@ -614,6 +713,8 @@ function nodeValueSet() {
   handleMouse()
   inpTarget.value = inpValue
   moveInputField(-500,-500)
+
+  inp.value("")
 }
 
 function edgeValueSet() {
@@ -625,6 +726,8 @@ function edgeValueSet() {
   handleMouse()
   inpTarget.value = parseInt(inpValue)
   moveInputField(-500,-500)
+
+  inp.value("")
 }
 
 function resetColors() {
@@ -635,6 +738,7 @@ function resetColors() {
   for(node of nodes){
     node.fillColor = [28,42,53]
     node.outlineColor = [255,255,255]
+    node.label = ""
   }
 }
 
@@ -725,7 +829,7 @@ function setup() {
 
   newEdge.value = 3
 
-  graph.primMST(newNode1)
+  graph.dijkstraSPT(newNode1)
 
   //moveInputField(100,100)
 
@@ -746,8 +850,6 @@ function draw() {
   for(node of nodes){
     node.draw()
   }
-
-  graph.draw()
 
   fill(WHITE)
   noStroke()
@@ -855,6 +957,18 @@ function mousePressed() {
       }
     }
 
+    else if(clickMode == "dijkstraSPT" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statustext = "Dijkstra's Algo: Running"
+          graph.dijkstraSPT(selectedNode)
+          break
+        }
+      }
+    }
+
     else if(clickMode == "none" && editingMode == false){
       for(node of nodes){
         selectedNode = node.clicked()
@@ -955,3 +1069,4 @@ function mouseReleased(){
     }
   }
 }
+
