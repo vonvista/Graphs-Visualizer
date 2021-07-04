@@ -281,21 +281,13 @@ class GraphNode {
     this.size = 50
     this.outlineColor = [255,255,255]
     this.fillColor = [28,42,53]
+    this.label = ""
+
   }
   draw(){
     fill(this.fillColor[0], this.fillColor[1], this.fillColor[2]);
     stroke(this.outlineColor[0], this.outlineColor[1], this.outlineColor[2])
-
-    // if(this.color[0] < 255){
-    //   this.color[0] += 3
-    // }
-    // if(this.color[1] < 255){
-    //   this.color[1] += 3
-    // }
-    // if(this.color[2] < 255){
-    //   this.color[2] += 3
-    // }
-
+    strokeWeight(1)
 
     ellipse(this.x, this.y, this.size, this.size)
 
@@ -313,6 +305,14 @@ class GraphNode {
       fill(255, 255, 255);
       textSize(12)
       text(this.value, this.x, this.y)
+    }
+
+    if(this.label != ""){
+      strokeWeight(4)
+      stroke(28, 42, 53)
+      fill(255, 255, 255);
+      textSize(12)
+      text(this.label, this.x, this.y - 35)
     }
   }
   clicked(){
@@ -372,6 +372,7 @@ class Edge {
     distance = curveDistance/distance
     
     //Control line shape
+    strokeWeight(2)
     stroke(this.color[0], this.color[1], this.color[2])
 
     // if(this.color[0] < 255){
@@ -601,6 +602,41 @@ function resetColors() {
   }
 }
 
+function getEdge(u,v) {
+  if(edges.has(v.value + "," + u.value)){
+    return(edges.get(v.value + "," + u.value))
+  }
+  return(edges.get(u.value + "," + v.value))
+}
+
+function addNodeManual(value, x, y){
+  let newNode = new GraphNode(x, y)
+  nodes.add(newNode)
+  newNode.value = value
+  graph.addVertex(newNode)
+  return newNode
+}
+
+function addEdgeManual(u, v){
+
+  if(edges.has(u.value + "," + v.value) || 
+  edges.has(v.value + "," + u.value)){
+    return
+  }
+
+  let lineType = "straight"
+
+  if(u == v){
+    lineType = "loop"
+  }
+
+  var newEdge = new Edge(u, v, lineType)
+  edges.set(u.value + "," + v.value, newEdge)
+  graph.addEdge(u, v)
+
+}
+
+
 
 let nodes = new Set()
 let edges = new Map()
@@ -613,6 +649,8 @@ let startnode = undefined, endnode = undefined
 var graph = new Graph()
 
 var statusText = "Standby"
+var statusText2 = ""
+var statusText3 = ""
 
 function setup() {
   //createCanvas(400, 400);
@@ -632,41 +670,30 @@ function setup() {
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
 
-  
+  node1 = addNodeManual(1, 100, 300)
+  node2 = addNodeManual(2, 300, 100)
+  node3 = addNodeManual(3, 500, 100)
+  node4 = addNodeManual(4, 700, 100)
+  node5 = addNodeManual(5, 900, 300)
+  node6 = addNodeManual(6, 700, 500)
+  node7 = addNodeManual(7, 500, 500)
+  node8 = addNodeManual(8, 300, 500)
+  node9 = addNodeManual(9, 500, 300)
 
-  let newNode1 = new GraphNode(100, 100)
-  nodes.add(newNode1)
-  newNode1.value = 1
-  graph.addVertex(newNode1)
-
-  let newNode2 = new GraphNode(200, 100)
-  nodes.add(newNode2)
-  newNode2.value = 2
-  graph.addVertex(newNode2)
-
-  let newNode3 = new GraphNode(100, 200)
-  nodes.add(newNode3)
-  newNode3.value = 3
-  graph.addVertex(newNode3)
-
-  let newNode4 = new GraphNode(200, 200)
-  nodes.add(newNode4)
-  newNode4.value = 4
-  graph.addVertex(newNode4)
-
-  var newEdge = new Edge(newNode1, newNode2, "straight")
-  edges.set(newNode1.value + "," + newNode2.value, newEdge)
-  graph.addEdge(newNode1, newNode2)
-
-  newEdge = new Edge(newNode1, newNode3, "straight")
-  edges.set(newNode1.value + "," + newNode3.value, newEdge)
-  graph.addEdge(newNode1, newNode3)
-
-  newEdge = new Edge(newNode1, newNode4, "straight")
-  edges.set(newNode1.value + "," + newNode4.value, newEdge)
-  graph.addEdge(newNode1, newNode4)
-
-  graph.greedyColoring(newNode1)
+  addEdgeManual(node1, node2)
+  addEdgeManual(node8, node1)
+  addEdgeManual(node2, node3)
+  addEdgeManual(node3, node4)
+  addEdgeManual(node4, node5)
+  addEdgeManual(node5, node6)
+  addEdgeManual(node4, node6)
+  addEdgeManual(node3, node6)
+  addEdgeManual(node6, node7)
+  addEdgeManual(node7, node9)
+  addEdgeManual(node7, node8)
+  addEdgeManual(node8, node9)
+  addEdgeManual(node2, node8)
+  addEdgeManual(node3, node9)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -674,6 +701,13 @@ function setup() {
 
 function draw() {
   background(28, 42, 53);
+
+  fill(WHITE)
+  noStroke()
+  textAlign(LEFT, TOP)
+  text(statusText, 10, 10)
+  text(statusText2, 10, 30)
+  text(statusText3, 10, 50)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -688,12 +722,8 @@ function draw() {
 
   graph.draw()
 
-  fill(WHITE)
-  noStroke()
-  textAlign(LEFT, TOP)
-  text(statusText, 10, 10)
-
   //tempLine
+  strokeWeight(1)
   stroke(255)
   line(startx, starty, endx, endy)
 }

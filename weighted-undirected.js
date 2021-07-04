@@ -1,6 +1,6 @@
 const controlsHeight = document.getElementById("controlPanel").offsetHeight 
 
-var animSpeed = 2
+var animSpeed = 7
 const easing = 0.05 * animSpeed
 
 
@@ -224,6 +224,8 @@ class Graph {
     let connected_node
     let minAdj = {}
 
+    statusText = "Running: Minimum Spanning Tree (Prim) :Node(" + startingNode.value + ")"
+
     for(let i of nodes){
       min = Number.POSITIVE_INFINITY
       //let min_node
@@ -275,7 +277,11 @@ class Graph {
           key[adj.value] = getEdge(adj, min_node).value
           minAdj[adj.value] = getEdge(adj, min_node)
         }
+
+        statusText2 = "Key:" + JSON.stringify(key)
       }
+
+      
 
     }
     //DIM OUT NODES THAT ARE NOT PART OF THE MST
@@ -301,7 +307,7 @@ class Graph {
     let sptSet = new Set()
 
     for(let node of nodes){
-      dist[node.value] = Number.MAX_VALUE
+      dist[node.value] = Number.POSITIVE_INFINITY
     }
 
     dist[startingNode.value] = 0
@@ -312,8 +318,12 @@ class Graph {
     //FOR VISUALIZER
     let minAdj = {}
 
+    //statusText3 = "SPT Set:" 
+
+    statusText = "Running: Shortest Path Tree (Dijkstra) :Node(" + startingNode.value + ")"
+
     for(let i of nodes){
-      min = Number.MAX_VALUE
+      min = Number.POSITIVE_INFINITY
       console.log("=============")
       console.log(dist)
 
@@ -335,7 +345,11 @@ class Graph {
       
       sptSet.add(min_node)
 
-      min_node.label = dist[min_node.value]
+      statusText2 = "Distance:" + JSON.stringify(dist)
+
+      //statusText3 += min_node.value + ","
+
+      min_node.label = "D:" + dist[min_node.value]
 
       if(min_node != startingNode){
         await min_node.changeFill(32,98,149)
@@ -349,11 +363,11 @@ class Graph {
       if(min_node != startingNode) await minAdj[min_node.value].changeFill(126, 198, 247)
 
       for(let adj of this.AdjList.get(min_node)){
-
         
         if(getEdge(adj, min_node).value != 0 && sptSet.has(adj) == false && 
-        (dist[min_node.value] != Number.MAX_VALUE &&
+        (dist[min_node.value] != Number.POSITIVE_INFINITY &&
         dist[min_node.value] + getEdge(adj, min_node).value < dist[adj.value])){
+
           console.log(dist[adj.value])
           console.log(dist[min_node.value] + getEdge(adj, min_node).value)
           await getEdge(adj, min_node).changeFill(255,157,0)
@@ -362,6 +376,8 @@ class Graph {
           dist[adj.value] = dist[min_node.value] + getEdge(adj, min_node).value
           minAdj[adj.value] = getEdge(adj, min_node)
         }
+
+        statusText2 = "Distance:" + JSON.stringify(dist)
       }
 
     }
@@ -390,14 +406,6 @@ class Graph {
   }
 }
 
-function getEdge(u,v) {
-  if(edges.has(v.value + "," + u.value)){
-    return(edges.get(v.value + "," + u.value))
-  }
-  return(edges.get(u.value + "," + v.value))
-}
-
-
 
 class GraphNode {
   constructor(x, y){
@@ -411,19 +419,10 @@ class GraphNode {
     
   }
   draw(){
+    
     fill(this.fillColor[0], this.fillColor[1], this.fillColor[2]);
     stroke(this.outlineColor[0], this.outlineColor[1], this.outlineColor[2])
-
-    // if(this.color[0] < 255){
-    //   this.color[0] += 3
-    // }
-    // if(this.color[1] < 255){
-    //   this.color[1] += 3
-    // }
-    // if(this.color[2] < 255){
-    //   this.color[2] += 3
-    // }
-
+    strokeWeight(1)
 
     ellipse(this.x, this.y, this.size, this.size)
 
@@ -443,6 +442,7 @@ class GraphNode {
     }
 
     if(this.label != ""){
+      strokeWeight(4)
       stroke(28, 42, 53)
       fill(255, 255, 255);
       textSize(12)
@@ -506,6 +506,7 @@ class Edge {
     distance = curveDistance/distance
     
     //Control line shape
+    strokeWeight(2)
     stroke(this.color[0], this.color[1], this.color[2])
 
     // if(this.color[0] < 255){
@@ -575,6 +576,10 @@ class Edge {
     // rotate(angle-HALF_PI); //rotates the arrow point
     // triangle(-offset*0.5, offset, offset*0.5, offset, 0, -offset/2); //draws the arrow point as a triangle
     // pop();
+
+    fill(this.color[0], this.color[1], this.color[2])
+    stroke(28, 42, 53)
+    strokeWeight(4)
 
     textSize(12)
 
@@ -742,6 +747,16 @@ function resetColors() {
     node.outlineColor = [255,255,255]
     node.label = ""
   }
+
+  statusText2 = ""
+  statusText3 = ""
+}
+
+function getEdge(u,v) {
+  if(edges.has(v.value + "," + u.value)){
+    return(edges.get(v.value + "," + u.value))
+  }
+  return(edges.get(u.value + "," + v.value))
 }
 
 function addNodeManual(value, x, y){
@@ -784,6 +799,8 @@ let startnode = undefined, endnode = undefined
 var graph = new Graph()
 
 var statusText = "Standby"
+var statusText2 = ""
+var statusText3 = ""
 
 function setup() {
   //createCanvas(400, 400);
@@ -803,61 +820,6 @@ function setup() {
   inpButton.parent("sketchHolder")
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
-
-  // let newNode1 = new GraphNode(100, 100)
-  // nodes.add(newNode1)
-  // newNode1.value = 1
-  // graph.addVertex(newNode1)
-
-  // let newNode2 = new GraphNode(200, 100)
-  // nodes.add(newNode2)
-  // newNode2.value = 2
-  // graph.addVertex(newNode2)
-
-  // let newNode3 = new GraphNode(100, 200)
-  // nodes.add(newNode3)
-  // newNode3.value = 3
-  // graph.addVertex(newNode3)
-
-  // let newNode4 = new GraphNode(200, 200)
-  // nodes.add(newNode4)
-  // newNode4.value = 4
-  // graph.addVertex(newNode4)
-
-  // let newNode5 = new GraphNode(300, 200)
-  // nodes.add(newNode5)
-  // newNode5.value = 5
-  // graph.addVertex(newNode5)
-
-  // var newEdge = new Edge(newNode1, newNode2, "straight")
-  // edges.set(newNode1.value + "," + newNode2.value, newEdge)
-  // graph.addEdge(newNode1, newNode2)
-
-  // newEdge.value = 2
-
-  // newEdge = new Edge(newNode1, newNode3, "straight")
-  // edges.set(newNode1.value + "," + newNode3.value, newEdge)
-  // graph.addEdge(newNode1, newNode3)
-
-  // newEdge.value = 4
-
-  // newEdge = new Edge(newNode1, newNode4, "straight")
-  // edges.set(newNode1.value + "," + newNode4.value, newEdge)
-  // graph.addEdge(newNode1, newNode4)
-
-  // newEdge.value = 8
-
-  // newEdge = new Edge(newNode2, newNode5, "straight")
-  // edges.set(newNode2.value + "," + newNode5.value, newEdge)
-  // graph.addEdge(newNode2, newNode5)
-
-  // newEdge.value = 9
-
-  // newEdge = new Edge(newNode4, newNode5, "straight")
-  // edges.set(newNode4.value + "," + newNode5.value, newEdge)
-  // graph.addEdge(newNode4, newNode5)
-
-  // newEdge.value = 3
 
   node1 = addNodeManual(1, 100, 300)
   node2 = addNodeManual(2, 300, 100)
@@ -895,6 +857,13 @@ function setup() {
 function draw() {
   background(28, 42, 53);
 
+  fill(WHITE)
+  noStroke()
+  textAlign(LEFT, TOP)
+  text(statusText, 10, 10)
+  text(statusText2, 10, 30)
+  text(statusText3, 10, 50)
+
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
 
@@ -906,12 +875,8 @@ function draw() {
     node.draw()
   }
 
-  fill(WHITE)
-  noStroke()
-  textAlign(LEFT, TOP)
-  text(statusText, 10, 10)
-
   //tempLine
+  strokeWeight(1)
   stroke(255)
   line(startx, starty, endx, endy)
 }

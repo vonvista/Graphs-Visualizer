@@ -207,6 +207,64 @@ class Graph {
     statusText = "DFS: Click on starting node to start"
   }
 
+  async greedyColoring(startingNode) {
+    var colors = [0,1,2,3,4,5,6,7,8,9]
+    var result = new Map()
+    var usedColors = new Set()
+
+    var colorValues = [[41, 89, 126],[126, 87, 41],[126, 41, 41],[103, 41, 126],4,5,6,7,8,9]
+
+    result[startingNode.value] = colors[0]
+
+    await startingNode.changeFill(colorValues[result[startingNode.value]][0],colorValues[result[startingNode.value]][1],colorValues[result[startingNode.value]][2])
+
+    console.log(startingNode.value)
+    console.log(result[startingNode.value])
+
+    statusText = "Greedy Coloring: Node(" + startingNode.value +") with first color"
+
+    for (const [key, value] of this.AdjList.entries()) {
+      
+      if(key == startingNode){
+        continue
+      }
+
+      console.log("==========")
+      console.log(key.value)
+
+      for (var i of value) { //Loop through adjacent nodes
+        if(!result.has(i.value)){  //Proxy !result
+          
+          usedColors.add(result[i.value])
+        }
+      }
+      console.log(usedColors.size);
+
+      let cr = 0
+      while(true){
+        if(!usedColors.has(cr)){
+          console.log()
+          break
+        }
+        cr += 1
+      }
+            
+      // Assign the found color
+      result[key.value] = colors[cr]
+
+      //await key.changeFill(colors[cr])
+      await key.changeFill(colorValues[cr][0],colorValues[cr][1],colorValues[cr][2])
+
+      console.log(result[key.value])
+
+      usedColors.clear()
+    }
+    
+    console.log(result.size)
+
+  }
+
+
   draw() {
 
     // for (const [key, value] of this.AdjList.entries()) {
@@ -224,11 +282,14 @@ class GraphNode {
     this.size = 50
     this.outlineColor = [255,255,255]
     this.fillColor = [28,42,53]
+    this.label = ""
     
   }
   draw(){
     fill(this.fillColor[0], this.fillColor[1], this.fillColor[2]);
     stroke(this.outlineColor[0], this.outlineColor[1], this.outlineColor[2])
+    strokeWeight(1)
+
 
     // if(this.color[0] < 255){
     //   this.color[0] += 3
@@ -256,6 +317,14 @@ class GraphNode {
       fill(255, 255, 255);
       textSize(12)
       text(this.value, this.x, this.y)
+    }
+
+    if(this.label != ""){
+      strokeWeight(4)
+      stroke(28, 42, 53)
+      fill(255, 255, 255);
+      textSize(12)
+      text(this.label, this.x, this.y - 35)
     }
   }
   clicked(){
@@ -315,17 +384,9 @@ class Edge {
     distance = curveDistance/distance
     
     //Control line shape
+    strokeWeight(2)
     stroke(this.color[0], this.color[1], this.color[2])
 
-    // if(this.color[0] < 255){
-    //   this.color[0] += 3
-    // }
-    // if(this.color[1] < 255){
-    //   this.color[1] += 3
-    // }
-    // if(this.color[2] < 255){
-    //   this.color[2] += 3
-    // }
 
     if(this.edgeType == "straight"){
       line(this.start.x, this.start.y, this.end.x, this.end.y)
@@ -457,7 +518,6 @@ function handleAddNode() {
   statusText = "Add Node"
 }
 
-
 function handleRemoveNode() {
   clickMode = "removeNode"
   statusText = "Remove Node"
@@ -487,6 +547,12 @@ function handleBFS() {
 function handleDFS() {
   clickMode = "dfs"
   statusText = "DFS: Click on starting node to start"
+  resetColors()
+}
+
+function handleGreedyColoring() {
+  clickMode = "greedyColoring"
+  statusText = "Greedy Coloring: Click on starting node to start"
   resetColors()
 }
 
@@ -535,6 +601,41 @@ function resetColors() {
   }
 }
 
+function getEdge(u,v) {
+  return(edges.get(u.value + "," + v.value))
+}
+
+function addNodeManual(value, x, y){
+  let newNode = new GraphNode(x, y)
+  nodes.add(newNode)
+  newNode.value = value
+  graph.addVertex(newNode)
+  return newNode
+}
+
+function addEdgeManual(u, v){
+
+  if(edges.has(u.value + "," + v.value)){
+    return
+  }
+
+  let lineType = "straight"
+
+  if(u == v){
+    lineType = "loop"
+  }
+
+  if(graph.AdjList.get(v).has(u)){
+    edges.get(v.value + "," + u.value).edgeType = "curve"
+    lineType = "curve"
+  }
+
+  var newEdge = new Edge(u, v, lineType)
+  edges.set(u.value + "," + v.value, newEdge)
+  graph.addEdge(u, v)
+
+}
+
 
 let nodes = new Set()
 let edges = new Map()
@@ -567,7 +668,30 @@ function setup() {
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
 
-  //moveInputField(100,100)
+  node1 = addNodeManual(1, 100, 300)
+  node2 = addNodeManual(2, 300, 100)
+  node3 = addNodeManual(3, 500, 100)
+  node4 = addNodeManual(4, 700, 100)
+  node5 = addNodeManual(5, 900, 300)
+  node6 = addNodeManual(6, 700, 500)
+  node7 = addNodeManual(7, 500, 500)
+  node8 = addNodeManual(8, 300, 500)
+  node9 = addNodeManual(9, 500, 300)
+
+  addEdgeManual(node1, node2)
+  addEdgeManual(node8, node1)
+  addEdgeManual(node2, node3)
+  addEdgeManual(node3, node4)
+  addEdgeManual(node4, node5)
+  addEdgeManual(node5, node6)
+  addEdgeManual(node4, node6)
+  addEdgeManual(node3, node6)
+  addEdgeManual(node6, node7)
+  addEdgeManual(node7, node9)
+  addEdgeManual(node7, node8)
+  addEdgeManual(node8, node9)
+  addEdgeManual(node2, node8)
+  addEdgeManual(node3, node9)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -595,6 +719,7 @@ function draw() {
   text(statusText, 10, 10)
 
   //tempLine
+  strokeWeight(1)
   stroke(255)
   line(startx, starty, endx, endy)
 }
@@ -679,6 +804,18 @@ function mousePressed() {
           console.log("HERE")
           statustext = "DFS: Running"
           graph.dfs(selectedNode)
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "greedyColoring" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statusText = "Greedy Coloring: Running"
+          graph.greedyColoring(selectedNode)
           break
         }
       }

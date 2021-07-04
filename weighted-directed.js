@@ -1,6 +1,7 @@
-const easing = 0.05
 const controlsHeight = document.getElementById("controlPanel").offsetHeight 
 
+var animSpeed = 7
+const easing = 0.05 * animSpeed
 
 var clickMode = "none"
 var inp, inpButton, inpValue, inpTarget
@@ -9,10 +10,17 @@ var stringValue = ""
 var keyPress
 var editingMode = false
 
-
 //COLORS
-let YELLOW = [255, 242, 0]
-let WHITE = [255,255,255]
+const YELLOW = [255, 242, 0]
+const WHITE = [255,255,255]
+const BASE_DARKBLUE = [28,42,53]
+
+const VISITED_COLOR = [32,98,149]
+const TRAVERSAL_OUTLINE = [255,157,0]
+
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve,ms));
+}
 
 class Graph {
   // defining vertex array and
@@ -64,6 +72,332 @@ class Graph {
     this.AdjList.delete(v);
   }
 
+  async bfs(startingNode) {
+    // create a visited object
+    var visited = {};
+  
+    // Create an object for queue
+    var q = []
+  
+    // add the starting node to the queue
+    visited[startingNode.value] = true;
+    q.push(startingNode);
+    await startingNode.changeFill(32,98,149)
+    //startingNode.outlineColor = [255,157,0]
+    await startingNode.changeOutline(255,157,0)
+
+    statusText = "Running: BFS(" + startingNode.value + ")"
+  
+    // loop until queue is element
+    while (q.length != 0) {
+      // get the element from the queue
+     
+      var getQueueElement = q.shift();
+
+      // passing the current vertex to callback funtion
+      console.log(getQueueElement.value);
+      await getQueueElement.changeFill(32,98,149)
+
+      // get the adjacent list for current vertex
+      var get_List = this.AdjList.get(getQueueElement);
+
+      // loop through the list and add the element to the
+      // queue if it is not processed yet
+      for (var i of get_List) {
+        
+        //console.log(i)
+        console.log(visited)
+        
+        var neigh = i;
+
+        //FOR VISUALIZER
+        if(edges.has(getQueueElement.value + "," + neigh.value)){
+          //edges.get(getQueueElement.value + "," + neigh.value).color = [255,157,0]
+          await edges.get(getQueueElement.value + "," + neigh.value).changeFill(255,157,0)
+        }
+        else {
+          //edges.get(neigh.value + "," + getQueueElement.value).color = [255,157,0]
+          await edges.get(neigh.value + "," + getQueueElement.value).changeFill(255,157,0)
+        }
+        //await sleep(200)
+
+        if (!visited[neigh.value]) {
+          visited[neigh.value] = true;
+          
+          //neigh.outlineColor = [255,157,0]
+          await neigh.changeOutline(255,157,0)
+          //await sleep(200)
+          
+          q.push(neigh);
+        }
+        //console.log(q.length)
+      }
+
+      console.log(q)
+    }
+    statusText = "BFS: Click on starting node to start"
+  }
+
+  async dfs(startingNode) {
+    // create a visited object
+    var visited = {};
+  
+    // Create an object for queue
+    var q = []
+  
+    // add the starting node to the queue
+    visited[startingNode.value] = true;
+    q.push(startingNode);
+    await startingNode.changeFill(32,98,149)
+    //startingNode.outlineColor = [255,157,0]
+    await startingNode.changeOutline(255,157,0)
+
+    //console.log(visited)
+    //console.log(q)
+    statusText = "Running: DFS(" + startingNode.value + ")"
+  
+    // loop until queue is element
+    while (q.length != 0) {
+      // get the element from the queue
+      //console.log(q)
+     
+      var getQueueElement = q.pop();
+
+      // passing the current vertex to callback funtion
+      console.log(getQueueElement.value);
+      await getQueueElement.changeFill(32,98,149)
+
+      // get the adjacent list for current vertex
+      var get_List = this.AdjList.get(getQueueElement);
+
+      // loop through the list and add the element to the
+      // queue if it is not processed yet
+      for (var i of get_List) {
+        
+        //console.log(i)
+        console.log(visited)
+        
+        var neigh = i;
+
+        //FOR VISUALIZER
+        if(edges.has(getQueueElement.value + "," + neigh.value)){
+          //edges.get(getQueueElement.value + "," + neigh.value).color = [255,157,0]
+          await edges.get(getQueueElement.value + "," + neigh.value).changeFill(255,157,0)
+        }
+        else {
+          //edges.get(neigh.value + "," + getQueueElement.value).color = [255,157,0]
+          await edges.get(neigh.value + "," + getQueueElement.value).changeFill(255,157,0)
+        }
+        //await sleep(200)
+
+        if (!visited[neigh.value]) {
+          visited[neigh.value] = true;
+          
+          //neigh.outlineColor = [255,157,0]
+          await neigh.changeOutline(255,157,0)
+          //await sleep(200)
+          q.push(neigh);
+        }
+        //console.log(q.length)
+      }
+
+      console.log(q)
+    }
+    statusText = "DFS: Click on starting node to start"
+  }
+
+  async primMST(startingNode) {
+    //let key = new Map()
+    let key = {}
+    let MST = []
+    let mstSet = new Set()
+
+    MST.push(startingNode.value)
+    key[startingNode.value] = 0
+
+    let min
+    let min_node = startingNode
+
+    //FOR VISUALIZER
+    let connected_node
+    let minAdj = {}
+
+    statusText = "Running: Minimum Spanning Tree (Prim) :Node(" + startingNode.value + ")"
+
+    for(let i of nodes){
+      min = Number.POSITIVE_INFINITY
+      //let min_node
+      console.log("=============")
+      //console.log(key)
+      //console.log(mstSet)
+      for(let v of mstSet){
+        
+        for(let adj of this.AdjList.get(v)){
+
+          if(mstSet.has(adj) == false && (key[adj.value] == undefined || key[adj.value] < min)){
+            // console.log("HERE")
+            // console.log(mstSet)
+            // console.log(adj.value)
+            min = key[adj.value]
+            min_node = adj
+            connected_node = v
+
+            console.log(key)
+            console.log(connected_node)
+          }
+        }
+        
+      }
+      console.log(min_node)
+      
+      mstSet.add(min_node)
+
+      if(min_node != startingNode){
+        await min_node.changeFill(32,98,149)
+      }
+      else {
+        await min_node.changeFill(103, 41, 126)
+      }
+      await min_node.changeOutline(255,157,0)
+
+
+      if(min_node != startingNode) await minAdj[min_node.value].changeFill(126, 198, 247)
+
+      for(let adj of this.AdjList.get(min_node)){
+        if(getEdge(min_node, adj).value != 0 && mstSet.has(adj) == false && 
+        (key[adj.value] == undefined || getEdge(min_node, adj).value < key[adj.value])){
+          console.log("HERE")
+          MST.push(min_node.value)
+
+          await getEdge(min_node, adj).changeFill(255,157,0)
+          await adj.changeOutline(255,157,0)
+
+          key[adj.value] = getEdge(min_node, adj).value
+          minAdj[adj.value] = getEdge(min_node, adj)
+        }
+
+        statusText2 = "Key:" + JSON.stringify(key)
+      }
+
+      
+
+    }
+    //DIM OUT NODES THAT ARE NOT PART OF THE MST
+    for (const [nodes, edge] of edges.entries()) {
+      console.log(edge.color)
+      if(edge.color[0] == 255 && edge.color[1] == 255 && edge.color[2] == 255){
+        
+        await edge.changeFill(27, 69, 94)
+      }
+      if(edge.color[0] == 255 && edge.color[1] == 157 && edge.color[2] == 0){
+        
+        await edge.changeFill(27, 69, 94)
+      }
+      
+    }
+    
+  }
+
+  async dijkstraSPT(startingNode) {
+    //let key = new Map()
+    let dist = {}
+    let SPT = []
+    let sptSet = new Set()
+
+    for(let node of nodes){
+      dist[node.value] = Number.POSITIVE_INFINITY
+    }
+
+    dist[startingNode.value] = 0
+
+    let min
+    let min_node = startingNode
+
+    //FOR VISUALIZER
+    let minAdj = {}
+
+    //statusText3 = "SPT Set:" 
+
+    statusText = "Running: Shortest Path Tree (Dijkstra) :Node(" + startingNode.value + ")"
+
+    for(let i of nodes){
+      min = Number.POSITIVE_INFINITY
+      console.log("=============")
+      console.log(dist)
+
+      for(let v of sptSet){
+        
+        for(let adj of this.AdjList.get(v)){
+
+          if(sptSet.has(adj) == false && dist[adj.value] <= min){
+            
+
+            min = dist[adj.value]
+            min_node = adj
+            
+          }
+        }
+        
+      }
+      //console.log(min_node)
+      
+      sptSet.add(min_node)
+
+      statusText2 = "Distance:" + JSON.stringify(dist)
+
+      //statusText3 += min_node.value + ","
+
+      min_node.label = "D:" + dist[min_node.value]
+
+      if(min_node != startingNode){
+        await min_node.changeFill(32,98,149)
+      }
+      else {
+        await min_node.changeFill(103, 41, 126)
+      }
+      await min_node.changeOutline(255,157,0)
+
+      //console.log(minAdj)
+      if(min_node != startingNode) await minAdj[min_node.value].changeFill(126, 198, 247)
+
+      for(let adj of this.AdjList.get(min_node)){
+        
+        if(getEdge(min_node, adj).value != 0 && sptSet.has(adj) == false && 
+        (dist[min_node.value] != Number.POSITIVE_INFINITY &&
+        dist[min_node.value] + getEdge(min_node, adj).value < dist[adj.value])){
+
+          console.log(dist[adj.value])
+          console.log(dist[min_node.value] + getEdge(min_node, adj).value)
+          await getEdge(min_node, adj).changeFill(255,157,0)
+          await adj.changeOutline(255,157,0)
+
+          dist[adj.value] = dist[min_node.value] + getEdge(min_node, adj).value
+          minAdj[adj.value] = getEdge(min_node, adj)
+        }
+
+        statusText2 = "Distance:" + JSON.stringify(dist)
+      }
+
+    }
+    //DIM OUT NODES THAT ARE NOT PART OF THE MST
+
+    for (const [nodes, edge] of edges.entries()) {
+      //console.log(edge.color)
+      if(edge.color[0] == 255 && edge.color[1] == 255 && edge.color[2] == 255){
+        
+        await edge.changeFill(27, 69, 94)
+      }
+      if(edge.color[0] == 255 && edge.color[1] == 157 && edge.color[2] == 0){
+        
+        await edge.changeFill(27, 69, 94)
+      }
+      
+    }
+    
+  }
+
+
+
   draw() {
 
     // for (const [key, value] of this.AdjList.entries()) {
@@ -79,12 +413,16 @@ class GraphNode {
     this.x = x
     this.y = y
     this.size = 50
-    this.color = [255,255,255]
+    this.outlineColor = [255,255,255]
+    this.fillColor = [28,42,53]
+    this.label = ""
     
   }
   draw(){
-    fill(28, 42, 53);
-    stroke(this.color[0], this.color[1], this.color[2])
+    fill(this.fillColor[0], this.fillColor[1], this.fillColor[2]);
+    stroke(this.outlineColor[0], this.outlineColor[1], this.outlineColor[2])
+    strokeWeight(1)
+
 
     // if(this.color[0] < 255){
     //   this.color[0] += 3
@@ -113,6 +451,15 @@ class GraphNode {
       textSize(12)
       text(this.value, this.x, this.y)
     }
+
+    if(this.label != ""){
+      strokeWeight(4)
+      stroke(28, 42, 53)
+      fill(255, 255, 255);
+      textSize(12)
+      text(this.label, this.x, this.y - 35)
+    }
+
   }
   clicked(){
     if(!editingMode){
@@ -121,6 +468,34 @@ class GraphNode {
         return this
       }
     }
+  }
+  async changeFill(r, g, b) {
+    // console.log("OLD X: " + this.x + ",Y: " + this.y)
+    // console.log("X: " + newX + ",Y: " + newY)
+    for(let i = 0; i <= (150 / animSpeed); i++){
+      this.fillColor[0] = this.fillColor[0] + (r - this.fillColor[0]) * easing
+      this.fillColor[1] = this.fillColor[1] + (g - this.fillColor[1]) * easing
+      this.fillColor[2] = this.fillColor[2] + (b - this.fillColor[2]) * easing
+      await sleep(2)
+    }
+    
+    this.fillColor[0] = r
+    this.fillColor[1] = g
+    this.fillColor[2] = b
+  }
+  async changeOutline(r, g, b) {
+    // console.log("OLD X: " + this.x + ",Y: " + this.y)
+    // console.log("X: " + newX + ",Y: " + newY)
+    for(let i = 0; i <= (150 / animSpeed); i++){
+      this.outlineColor[0] = this.outlineColor[0] + (r - this.outlineColor[0]) * easing
+      this.outlineColor[1] = this.outlineColor[1] + (g - this.outlineColor[1]) * easing
+      this.outlineColor[2] = this.outlineColor[2] + (b - this.outlineColor[2]) * easing
+      await sleep(2)
+    }
+    
+    this.outlineColor[0] = r
+    this.outlineColor[1] = g
+    this.outlineColor[2] = b
   }
 }
 
@@ -143,6 +518,7 @@ class Edge {
     distance = curveDistance/distance
     
     //Control line shape
+    strokeWeight(2)
     stroke(this.color[0], this.color[1], this.color[2])
 
     // if(this.color[0] < 255){
@@ -211,6 +587,10 @@ class Edge {
     triangle(-offset*0.5, offset, offset*0.5, offset, 0, -offset/2); //draws the arrow point as a triangle
     pop();
 
+    fill(this.color[0], this.color[1], this.color[2])
+    stroke(28, 42, 53)
+    strokeWeight(4)
+
     textSize(12)
 
     //control transition labels
@@ -251,6 +631,22 @@ class Edge {
       return this
     }
   }
+
+  async changeFill(r, g, b) {
+    // console.log("OLD X: " + this.x + ",Y: " + this.y)
+    // console.log("X: " + newX + ",Y: " + newY)
+    for(let i = 0; i <= (150 / animSpeed); i++){
+      this.color[0] = this.color[0] + (r - this.color[0]) * easing
+      this.color[1] = this.color[1] + (g - this.color[1]) * easing
+      this.color[2] = this.color[2] + (b - this.color[2]) * easing
+      await sleep(2)
+    }
+    
+    this.color[0] = r
+    this.color[1] = g
+    this.color[2] = b
+  }
+
 }
 
 function keyPressed() {
@@ -290,6 +686,30 @@ function handleMouse() {
   statusText = "Mouse"
 }
 
+function handleBFS() {
+  clickMode = "bfs"
+  statusText = "BFS: Click on starting node to start"
+  resetColors()
+}
+
+function handleDFS() {
+  clickMode = "dfs"
+  statusText = "DFS: Click on starting node to start"
+  resetColors()
+}
+
+function handlePrimMST() {
+  clickMode = "primMST"
+  statusText = "Minimum Spanning Tree (Prim): Click on starting node to start"
+  resetColors()
+}
+
+function handleDijkstraSPT() {
+  clickMode = "dijkstraSPT"
+  statusText = "Shortest Path Tree (Dijkstra): Click on starting node to start"
+  resetColors()
+}
+
 function moveInputField(x, y) {
   inp.position(x ,y)
   inpButton.position(x + 80,y)
@@ -324,6 +744,54 @@ function edgeValueSet() {
   moveInputField(-500,-500)
 }
 
+function resetColors() {
+  for (const [nodes, edge] of edges.entries()) {
+    edge.color = [255,255,255]
+  }
+
+  for(node of nodes){
+    node.fillColor = [28,42,53]
+    node.outlineColor = [255,255,255]
+    node.label = ""
+  }
+
+  statusText2 = ""
+  statusText3 = ""
+}
+
+function getEdge(u,v) {
+  return(edges.get(u.value + "," + v.value))
+}
+
+function addNodeManual(value, x, y){
+  let newNode = new GraphNode(x, y)
+  nodes.add(newNode)
+  newNode.value = value
+  graph.addVertex(newNode)
+  return newNode
+}
+
+function addEdgeManual(weight, u, v){
+
+  if(edges.has(u.value + "," + v.value) || 
+  edges.has(v.value + "," + u.value)){
+    return
+  }
+
+  let lineType = "straight"
+
+  if(u == v){
+    lineType = "loop"
+  }
+
+  var newEdge = new Edge(u, v, lineType)
+  edges.set(u.value + "," + v.value, newEdge)
+  graph.addEdge(u, v)
+
+  newEdge.value = weight
+}
+
+
 
 let nodes = new Set()
 let edges = new Map()
@@ -336,6 +804,8 @@ let startnode = undefined, endnode = undefined
 var graph = new Graph()
 
 var statusText = "Standby"
+var statusText2 = ""
+var statusText3 = ""
 
 function setup() {
   //createCanvas(400, 400);
@@ -356,6 +826,31 @@ function setup() {
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
 
+  node1 = addNodeManual(1, 100, 300)
+  node2 = addNodeManual(2, 300, 100)
+  node3 = addNodeManual(3, 500, 100)
+  node4 = addNodeManual(4, 700, 100)
+  node5 = addNodeManual(5, 900, 300)
+  node6 = addNodeManual(6, 700, 500)
+  node7 = addNodeManual(7, 500, 500)
+  node8 = addNodeManual(8, 300, 500)
+  node9 = addNodeManual(9, 500, 300)
+
+  addEdgeManual(4, node1, node2)
+  addEdgeManual(8, node8, node1)
+  addEdgeManual(8, node2, node3)
+  addEdgeManual(7, node3, node4)
+  addEdgeManual(9, node4, node5)
+  addEdgeManual(10, node5, node6)
+  addEdgeManual(14, node4, node6)
+  addEdgeManual(4, node3, node6)
+  addEdgeManual(2, node6, node7)
+  addEdgeManual(6, node7, node9)
+  addEdgeManual(1, node7, node8)
+  addEdgeManual(7, node8, node9)
+  addEdgeManual(11, node2, node8)
+  addEdgeManual(2, node3, node9)
+
   //moveInputField(100,100)
 
   rectMode(CENTER)
@@ -364,6 +859,13 @@ function setup() {
 
 function draw() {
   background(28, 42, 53);
+
+  fill(WHITE)
+  noStroke()
+  textAlign(LEFT, TOP)
+  text(statusText, 10, 10)
+  text(statusText2, 10, 30)
+  text(statusText3, 10, 50)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -376,14 +878,8 @@ function draw() {
     node.draw()
   }
 
-  graph.draw()
-
-  fill(WHITE)
-  noStroke()
-  textAlign(LEFT, TOP)
-  text(statusText, 10, 10)
-
   //tempLine
+  strokeWeight(1)
   stroke(255)
   line(startx, starty, endx, endy)
 }
@@ -445,6 +941,54 @@ function mousePressed() {
 
           edges.delete(edge.start.value + "," + edge.end.value)
           console.log("YES")
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "bfs" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statustext = "BFS: Running"
+          graph.bfs(selectedNode)
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "dfs" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statustext = "DFS: Running"
+          graph.dfs(selectedNode)
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "primMST" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statustext = "Prim's Algo: Running"
+          graph.primMST(selectedNode)
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "dijkstraSPT" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statustext = "Dijkstra's Algo: Running"
+          graph.dijkstraSPT(selectedNode)
           break
         }
       }
