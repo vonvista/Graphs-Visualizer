@@ -1,6 +1,6 @@
 const controlsHeight = document.getElementById("controlPanel").offsetHeight 
 
-var animSpeed = 4
+var animSpeed = 2
 const easing = 0.05 * animSpeed
 
 
@@ -331,7 +331,7 @@ class Graph {
         }
         
       }
-      console.log(min_node)
+      //console.log(min_node)
       
       sptSet.add(min_node)
 
@@ -345,15 +345,17 @@ class Graph {
       }
       await min_node.changeOutline(255,157,0)
 
-      console.log(minAdj)
+      //console.log(minAdj)
       if(min_node != startingNode) await minAdj[min_node.value].changeFill(126, 198, 247)
 
       for(let adj of this.AdjList.get(min_node)){
 
+        
         if(getEdge(adj, min_node).value != 0 && sptSet.has(adj) == false && 
-        (dist[adj.value] != Number.MAX_VALUE || 
+        (dist[min_node.value] != Number.MAX_VALUE &&
         dist[min_node.value] + getEdge(adj, min_node).value < dist[adj.value])){
-
+          console.log(dist[adj.value])
+          console.log(dist[min_node.value] + getEdge(adj, min_node).value)
           await getEdge(adj, min_node).changeFill(255,157,0)
           await adj.changeOutline(255,157,0)
 
@@ -366,7 +368,7 @@ class Graph {
     //DIM OUT NODES THAT ARE NOT PART OF THE MST
 
     for (const [nodes, edge] of edges.entries()) {
-      console.log(edge.color)
+      //console.log(edge.color)
       if(edge.color[0] == 255 && edge.color[1] == 255 && edge.color[2] == 255){
         
         await edge.changeFill(27, 69, 94)
@@ -742,6 +744,34 @@ function resetColors() {
   }
 }
 
+function addNodeManual(value, x, y){
+  let newNode = new GraphNode(x, y)
+  nodes.add(newNode)
+  newNode.value = value
+  graph.addVertex(newNode)
+  return newNode
+}
+
+function addEdgeManual(weight, u, v){
+
+  if(edges.has(u.value + "," + v.value) || 
+  edges.has(v.value + "," + u.value)){
+    return
+  }
+
+  let lineType = "straight"
+
+  if(u == v){
+    lineType = "loop"
+  }
+
+  var newEdge = new Edge(u, v, lineType)
+  edges.set(u.value + "," + v.value, newEdge)
+  graph.addEdge(u, v)
+
+  newEdge.value = weight
+}
+
 
 let nodes = new Set()
 let edges = new Map()
@@ -774,62 +804,87 @@ function setup() {
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
 
-  let newNode1 = new GraphNode(100, 100)
-  nodes.add(newNode1)
-  newNode1.value = 1
-  graph.addVertex(newNode1)
+  // let newNode1 = new GraphNode(100, 100)
+  // nodes.add(newNode1)
+  // newNode1.value = 1
+  // graph.addVertex(newNode1)
 
-  let newNode2 = new GraphNode(200, 100)
-  nodes.add(newNode2)
-  newNode2.value = 2
-  graph.addVertex(newNode2)
+  // let newNode2 = new GraphNode(200, 100)
+  // nodes.add(newNode2)
+  // newNode2.value = 2
+  // graph.addVertex(newNode2)
 
-  let newNode3 = new GraphNode(100, 200)
-  nodes.add(newNode3)
-  newNode3.value = 3
-  graph.addVertex(newNode3)
+  // let newNode3 = new GraphNode(100, 200)
+  // nodes.add(newNode3)
+  // newNode3.value = 3
+  // graph.addVertex(newNode3)
 
-  let newNode4 = new GraphNode(200, 200)
-  nodes.add(newNode4)
-  newNode4.value = 4
-  graph.addVertex(newNode4)
+  // let newNode4 = new GraphNode(200, 200)
+  // nodes.add(newNode4)
+  // newNode4.value = 4
+  // graph.addVertex(newNode4)
 
-  let newNode5 = new GraphNode(300, 200)
-  nodes.add(newNode5)
-  newNode5.value = 5
-  graph.addVertex(newNode5)
+  // let newNode5 = new GraphNode(300, 200)
+  // nodes.add(newNode5)
+  // newNode5.value = 5
+  // graph.addVertex(newNode5)
 
-  var newEdge = new Edge(newNode1, newNode2, "straight")
-  edges.set(newNode1.value + "," + newNode2.value, newEdge)
-  graph.addEdge(newNode1, newNode2)
+  // var newEdge = new Edge(newNode1, newNode2, "straight")
+  // edges.set(newNode1.value + "," + newNode2.value, newEdge)
+  // graph.addEdge(newNode1, newNode2)
 
-  newEdge.value = 2
+  // newEdge.value = 2
 
-  newEdge = new Edge(newNode1, newNode3, "straight")
-  edges.set(newNode1.value + "," + newNode3.value, newEdge)
-  graph.addEdge(newNode1, newNode3)
+  // newEdge = new Edge(newNode1, newNode3, "straight")
+  // edges.set(newNode1.value + "," + newNode3.value, newEdge)
+  // graph.addEdge(newNode1, newNode3)
 
-  newEdge.value = 4
+  // newEdge.value = 4
 
-  newEdge = new Edge(newNode1, newNode4, "straight")
-  edges.set(newNode1.value + "," + newNode4.value, newEdge)
-  graph.addEdge(newNode1, newNode4)
+  // newEdge = new Edge(newNode1, newNode4, "straight")
+  // edges.set(newNode1.value + "," + newNode4.value, newEdge)
+  // graph.addEdge(newNode1, newNode4)
 
-  newEdge.value = 8
+  // newEdge.value = 8
 
-  newEdge = new Edge(newNode2, newNode5, "straight")
-  edges.set(newNode2.value + "," + newNode5.value, newEdge)
-  graph.addEdge(newNode2, newNode5)
+  // newEdge = new Edge(newNode2, newNode5, "straight")
+  // edges.set(newNode2.value + "," + newNode5.value, newEdge)
+  // graph.addEdge(newNode2, newNode5)
 
-  newEdge.value = 9
+  // newEdge.value = 9
 
-  newEdge = new Edge(newNode4, newNode5, "straight")
-  edges.set(newNode4.value + "," + newNode5.value, newEdge)
-  graph.addEdge(newNode4, newNode5)
+  // newEdge = new Edge(newNode4, newNode5, "straight")
+  // edges.set(newNode4.value + "," + newNode5.value, newEdge)
+  // graph.addEdge(newNode4, newNode5)
 
-  newEdge.value = 3
+  // newEdge.value = 3
 
-  graph.dijkstraSPT(newNode1)
+  node1 = addNodeManual(1, 100, 300)
+  node2 = addNodeManual(2, 300, 100)
+  node3 = addNodeManual(3, 500, 100)
+  node4 = addNodeManual(4, 700, 100)
+  node5 = addNodeManual(5, 900, 300)
+  node6 = addNodeManual(6, 700, 500)
+  node7 = addNodeManual(7, 500, 500)
+  node8 = addNodeManual(8, 300, 500)
+  node9 = addNodeManual(9, 500, 300)
+
+  addEdgeManual(4, node1, node2)
+  addEdgeManual(8, node8, node1)
+  addEdgeManual(8, node2, node3)
+  addEdgeManual(7, node3, node4)
+  addEdgeManual(9, node4, node5)
+  addEdgeManual(10, node5, node6)
+  addEdgeManual(14, node4, node6)
+  addEdgeManual(4, node3, node6)
+  addEdgeManual(2, node6, node7)
+  addEdgeManual(6, node7, node9)
+  addEdgeManual(1, node7, node8)
+  addEdgeManual(7, node8, node9)
+  addEdgeManual(11, node2, node8)
+  addEdgeManual(2, node3, node9)
+
+  graph.dijkstraSPT(node1)
 
   //moveInputField(100,100)
 
