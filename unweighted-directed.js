@@ -872,10 +872,10 @@ function setup() {
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
 
-  
-
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
+
+  pixelDensity(displayDensity());
 }
 
 function draw() {
@@ -1105,9 +1105,6 @@ function mouseReleased(){
   }
 }
 
-
-
-
-
-
-
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}

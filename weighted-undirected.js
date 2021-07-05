@@ -970,6 +970,8 @@ function setup() {
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
+
+  pixelDensity(displayDensity())
 }
 
 function draw() {
@@ -1220,3 +1222,6 @@ function mouseReleased(){
   }
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
