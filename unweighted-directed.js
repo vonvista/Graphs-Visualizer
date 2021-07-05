@@ -345,6 +345,7 @@ class Graph {
       }
     }
 
+    handleMouse()
     enableButtonControls()
     
   }
@@ -685,6 +686,7 @@ function handleGreedyColoring() {
 
 function handleSCC() {
   graph.kosarajuSCC()
+  handleMouse()
   statusText = "Running: Kosaraju's Strongly Connected Components"
   resetColors()
 }

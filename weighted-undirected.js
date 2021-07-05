@@ -723,17 +723,6 @@ class Edge {
 
 // FUNCTIONS FOR CONTROL BUTTONS
 
-function keyPressed() {
-  if (keyCode === ENTER) {
-    console.log("Enter")
-    keyPress = "Enter"
-  }
-}
-
-function keyReleased() {
-  keyPress = null
-}
-
 function handleAddNode() {
   clickMode = "addNode"
   statusText = "Add Node"

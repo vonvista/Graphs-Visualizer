@@ -29,14 +29,23 @@
         <button onClick = handleAddEdge() class = "controlButton">Add Edge</button>
         <button onClick = handleRemoveNode() class = "controlButton">Remove Node</button>
         <button onClick = handleRemoveEdge() class = "controlButton">Remove Edge</button>
+        <button onClick = loadExample() class = "controlButton" style="background-color:#7e5729">Load Example</button>
+
       </div>
 
       <div class="controls">
         <p>Algorithms</p>
         <button onClick = handleBFS() class = "controlButton" style="background-color:#797e29">BFS</button>
         <button onClick = handleDFS() class = "controlButton" style="background-color:#797e29">DFS</button>
+        <button onClick = handleGreedyColoring() class = "controlButton" style="background-color:#797e29">Graph Coloring</button>
         <button onClick = handlePrimMST() class = "controlButton" style="background-color:#797e29">MST</button>
         <button onClick = handleDijkstraSPT() class = "controlButton" style="background-color:#797e29">SPT</button>
+        <button onClick = handleSCC() class = "controlButton" style="background-color:#797e29">SCC</button>
+
+        <p class="controlsTitle" style="margin-left:10px;">Animation Speed</p>
+        <input type="range" oninput=handleSliderAnimChange() min="1" max="20" step="0.25" value="4" class="slider" id="myRange">
+        <p class="controlsTitle" id=animSlider></p>
+      
       </div>
 
       <!-- <div class="controls"> 
