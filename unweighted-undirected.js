@@ -74,6 +74,9 @@ class Graph {
   }
 
   async bfs(startingNode) {
+
+    disableButtonControls()
+
     // create a visited object
     var visited = {};
   
@@ -136,10 +139,15 @@ class Graph {
 
       console.log(q)
     }
-    statusText = "BFS: Click on starting node to start"
+    statusText = "Breadth-First Search: Click on starting node to start"
+
+    enableButtonControls()
   }
 
   async dfs(startingNode) {
+
+    disableButtonControls()
+
     // create a visited object
     var visited = {};
   
@@ -204,15 +212,21 @@ class Graph {
 
       console.log(q)
     }
-    statusText = "DFS: Click on starting node to start"
+    statusText = "Depth-First Search: Click on starting node to start"
+
+    enableButtonControls()
   }
 
   async greedyColoring(startingNode) {
+
+    disableButtonControls()
+
     var colors = [0,1,2,3,4,5,6,7,8,9]
     var result = new Map()
     var usedColors = new Set()
 
-    var colorValues = [[41, 89, 126],[126, 87, 41],[126, 41, 41],[103, 41, 126],4,5,6,7,8,9]
+    var colorValues = [[41, 89, 126],[126, 87, 41],[126, 41, 41],[103, 41, 126],[71, 126, 41],
+    [121, 126, 41],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
 
     result[startingNode.value] = colors[0]
 
@@ -261,6 +275,8 @@ class Graph {
     }
     
     console.log(result.size)
+
+    enableButtonControls()
 
   }
 
@@ -502,36 +518,30 @@ class Edge {
   }
 }
 
-function keyPressed() {
-  if (keyCode === ENTER) {
-    console.log("Enter")
-    keyPress = "Enter"
-  }
-}
-
-function keyReleased() {
-  keyPress = null
-}
+// FUNCTIONS FOR CONTROL BUTTONS
 
 function handleAddNode() {
   clickMode = "addNode"
   statusText = "Add Node"
+  resetColors()
 }
-
 
 function handleRemoveNode() {
   clickMode = "removeNode"
   statusText = "Remove Node"
+  resetColors()
 }
 
 function handleRemoveEdge() {
   clickMode = "removeEdge"
   statusText = "Remove Edge"
+  resetColors()
 }
 
 function handleAddEdge() {
   clickMode = "addEdge"
   statusText = "Add Edge"
+  resetColors()
 }
 
 function handleMouse() {
@@ -541,13 +551,13 @@ function handleMouse() {
 
 function handleBFS() {
   clickMode = "bfs"
-  statusText = "BFS: Click on starting node to start"
+  statusText = "Breadth-First Search: Click on starting node to start"
   resetColors()
 }
 
 function handleDFS() {
   clickMode = "dfs"
-  statusText = "DFS: Click on starting node to start"
+  statusText = "Depth-First Search: Click on starting node to start"
   resetColors()
 }
 
@@ -556,6 +566,37 @@ function handleGreedyColoring() {
   statusText = "Greedy Coloring: Click on starting node to start"
   resetColors()
 }
+
+//FUNCTION FOR ANIMATION SLIDER
+
+var buttonControls = document.getElementsByClassName("controlButton");
+
+function disableButtonControls() {
+  for(button of buttonControls){
+    button.disabled = true
+  }
+}
+
+function enableButtonControls() {
+  for(button of buttonControls){
+    button.disabled = false
+  }
+  //statusText = "Standby"
+}
+
+document.getElementById("animSlider").innerHTML = document.getElementById("myRange").value
+animSpeed = document.getElementById("myRange").value
+
+function handleSliderAnimChange() {
+  output = document.getElementById("myRange").value
+  //document.getElementById("animSlider").innerHTML = output * 50
+  document.getElementById("animSlider").innerHTML = output
+  animSpeed = output
+  //var output = 
+  //output.innerHTML = slider.value; // Display the default slider value
+}
+
+//GENERAL FUNCTIONS
 
 function moveInputField(x, y) {
   inp.position(x ,y)
@@ -636,7 +677,36 @@ function addEdgeManual(u, v){
 
 }
 
+function loadExample() {
+  graph.AdjList = new Map()
+  nodes.clear()
+  edges.clear()
 
+  node1 = addNodeManual(1, 100, 300)
+  node2 = addNodeManual(2, 300, 100)
+  node3 = addNodeManual(3, 500, 100)
+  node4 = addNodeManual(4, 700, 100)
+  node5 = addNodeManual(5, 900, 300)
+  node6 = addNodeManual(6, 700, 500)
+  node7 = addNodeManual(7, 500, 500)
+  node8 = addNodeManual(8, 300, 500)
+  node9 = addNodeManual(9, 500, 300)
+
+  addEdgeManual(node1, node2)
+  addEdgeManual(node8, node1)
+  addEdgeManual(node2, node3)
+  addEdgeManual(node3, node4)
+  addEdgeManual(node4, node5)
+  addEdgeManual(node5, node6)
+  addEdgeManual(node4, node6)
+  addEdgeManual(node3, node6)
+  addEdgeManual(node6, node7)
+  addEdgeManual(node7, node9)
+  addEdgeManual(node7, node8)
+  addEdgeManual(node8, node9)
+  addEdgeManual(node2, node8)
+  addEdgeManual(node3, node9)
+}
 
 let nodes = new Set()
 let edges = new Map()
@@ -669,31 +739,6 @@ function setup() {
   inpButton.parent("sketchHolder")
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
-
-  node1 = addNodeManual(1, 100, 300)
-  node2 = addNodeManual(2, 300, 100)
-  node3 = addNodeManual(3, 500, 100)
-  node4 = addNodeManual(4, 700, 100)
-  node5 = addNodeManual(5, 900, 300)
-  node6 = addNodeManual(6, 700, 500)
-  node7 = addNodeManual(7, 500, 500)
-  node8 = addNodeManual(8, 300, 500)
-  node9 = addNodeManual(9, 500, 300)
-
-  addEdgeManual(node1, node2)
-  addEdgeManual(node8, node1)
-  addEdgeManual(node2, node3)
-  addEdgeManual(node3, node4)
-  addEdgeManual(node4, node5)
-  addEdgeManual(node5, node6)
-  addEdgeManual(node4, node6)
-  addEdgeManual(node3, node6)
-  addEdgeManual(node6, node7)
-  addEdgeManual(node7, node9)
-  addEdgeManual(node7, node8)
-  addEdgeManual(node8, node9)
-  addEdgeManual(node2, node8)
-  addEdgeManual(node3, node9)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -779,7 +824,7 @@ function mousePressed() {
         selectedNode = node.clicked()
         if(selectedNode != undefined){
           console.log("HERE")
-          statustext = "BFS: Running"
+          statustext = "Breadth-First Search: Running"
           graph.bfs(selectedNode)
           break
         }
@@ -791,7 +836,7 @@ function mousePressed() {
         selectedNode = node.clicked()
         if(selectedNode != undefined){
           console.log("HERE")
-          statustext = "DFS: Running"
+          statustext = "Depth-First Search: Running"
           graph.dfs(selectedNode)
           break
         }
