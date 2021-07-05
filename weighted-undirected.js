@@ -75,6 +75,9 @@ class Graph {
   }
 
   async bfs(startingNode) {
+
+    disableButtonControls()
+
     // create a visited object
     var visited = {};
   
@@ -88,7 +91,7 @@ class Graph {
     //startingNode.outlineColor = [255,157,0]
     await startingNode.changeOutline(255,157,0)
 
-    statusText = "Running: BFS(" + startingNode.value + ")"
+    statusText = "Running: Breadth-First Search(" + startingNode.value + ")"
   
     // loop until queue is element
     while (q.length != 0) {
@@ -137,10 +140,15 @@ class Graph {
 
       console.log(q)
     }
-    statusText = "BFS: Click on starting node to start"
+    statusText = "Breadth-First Search: Click on starting node to start"
+
+    enableButtonControls()
   }
 
   async dfs(startingNode) {
+
+    disableButtonControls()
+
     // create a visited object
     var visited = {};
   
@@ -156,7 +164,7 @@ class Graph {
 
     //console.log(visited)
     //console.log(q)
-    statusText = "Running: DFS(" + startingNode.value + ")"
+    statusText = "Running: Depth-First Search(" + startingNode.value + ")"
   
     // loop until queue is element
     while (q.length != 0) {
@@ -205,10 +213,78 @@ class Graph {
 
       console.log(q)
     }
-    statusText = "DFS: Click on starting node to start"
+    statusText = "Depth-First Search: Click on starting node to start"
+
+    enableButtonControls()
+  }
+
+  async greedyColoring(startingNode) {
+
+    disableButtonControls()
+
+    var colors = [0,1,2,3,4,5,6,7,8,9]
+    var result = new Map()
+    var usedColors = new Set()
+
+    var colorValues = [[41, 89, 126],[126, 87, 41],[126, 41, 41],[103, 41, 126],[71, 126, 41],
+    [121, 126, 41],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+
+    result[startingNode.value] = colors[0]
+
+    await startingNode.changeFill(colorValues[result[startingNode.value]][0],colorValues[result[startingNode.value]][1],colorValues[result[startingNode.value]][2])
+
+    console.log(startingNode.value)
+    console.log(result[startingNode.value])
+
+    statusText = "Greedy Coloring: Node(" + startingNode.value +") with first color"
+
+    for (const [key, value] of this.AdjList.entries()) {
+      
+      if(key == startingNode){
+        continue
+      }
+
+      console.log("==========")
+      console.log(key.value)
+
+      for (var i of value) { //Loop through adjacent nodes
+        if(!result.has(i.value)){  //Proxy !result
+          
+          usedColors.add(result[i.value])
+        }
+      }
+      console.log(usedColors.size);
+
+      let cr = 0
+      while(true){
+        if(!usedColors.has(cr)){
+          console.log()
+          break
+        }
+        cr += 1
+      }
+            
+      // Assign the found color
+      result[key.value] = colors[cr]
+
+      //await key.changeFill(colors[cr])
+      await key.changeFill(colorValues[cr][0],colorValues[cr][1],colorValues[cr][2])
+
+      console.log(result[key.value])
+
+      usedColors.clear()
+    }
+    
+    console.log(result.size)
+
+    enableButtonControls()
+
   }
 
   async primMST(startingNode) {
+
+    disableButtonControls()
+
     //let key = new Map()
     let key = {}
     let MST = []
@@ -297,10 +373,15 @@ class Graph {
       }
       
     }
+
+    enableButtonControls()
     
   }
 
   async dijkstraSPT(startingNode) {
+
+    disableButtonControls()
+
     //let key = new Map()
     let dist = {}
     let SPT = []
@@ -395,6 +476,8 @@ class Graph {
       }
       
     }
+
+    enableButtonControls()
     
   }
 
@@ -638,6 +721,8 @@ class Edge {
 
 }
 
+// FUNCTIONS FOR CONTROL BUTTONS
+
 function keyPressed() {
   if (keyCode === ENTER) {
     console.log("Enter")
@@ -652,21 +737,25 @@ function keyReleased() {
 function handleAddNode() {
   clickMode = "addNode"
   statusText = "Add Node"
+  resetColors()
 }
 
 function handleRemoveNode() {
   clickMode = "removeNode"
   statusText = "Remove Node"
+  resetColors()
 }
 
 function handleRemoveEdge() {
   clickMode = "removeEdge"
   statusText = "Remove Edge"
+  resetColors()
 }
 
 function handleAddEdge() {
   clickMode = "addEdge"
   statusText = "Add Edge"
+  resetColors()
 }
 
 function handleMouse() {
@@ -676,16 +765,21 @@ function handleMouse() {
 
 function handleBFS() {
   clickMode = "bfs"
-  statusText = "BFS: Click on starting node to start"
+  statusText = "Breadth-First Search: Click on starting node to start"
   resetColors()
 }
 
 function handleDFS() {
   clickMode = "dfs"
-  statusText = "DFS: Click on starting node to start"
+  statusText = "Depth-First Search: Click on starting node to start"
   resetColors()
 }
 
+function handleGreedyColoring() {
+  clickMode = "greedyColoring"
+  statusText = "Greedy Coloring: Click on starting node to start"
+  resetColors()
+}
 
 function handlePrimMST() {
   clickMode = "primMST"
@@ -698,6 +792,38 @@ function handleDijkstraSPT() {
   statusText = "Shortest Path Tree (Dijkstra): Click on starting node to start"
   resetColors()
 }
+
+//FUNCTION FOR ANIMATION SLIDER
+
+var buttonControls = document.getElementsByClassName("controlButton");
+
+function disableButtonControls() {
+  for(button of buttonControls){
+    button.disabled = true
+  }
+}
+
+function enableButtonControls() {
+  for(button of buttonControls){
+    button.disabled = false
+  }
+  //statusText = "Standby"
+}
+
+document.getElementById("animSlider").innerHTML = document.getElementById("myRange").value
+animSpeed = document.getElementById("myRange").value
+
+function handleSliderAnimChange() {
+  output = document.getElementById("myRange").value
+  //document.getElementById("animSlider").innerHTML = output * 50
+  document.getElementById("animSlider").innerHTML = output
+  animSpeed = output
+  //var output = 
+  //output.innerHTML = slider.value; // Display the default slider value
+}
+
+
+//GENERAL FUNCTIONS
 
 function moveInputField(x, y) {
   inp.position(x ,y)
@@ -787,6 +913,38 @@ function addEdgeManual(weight, u, v){
   newEdge.value = weight
 }
 
+function loadExample() {
+  graph.AdjList = new Map()
+  nodes.clear()
+  edges.clear()
+
+  node1 = addNodeManual(1, 100, 300)
+  node2 = addNodeManual(2, 300, 100)
+  node3 = addNodeManual(3, 500, 100)
+  node4 = addNodeManual(4, 700, 100)
+  node5 = addNodeManual(5, 900, 300)
+  node6 = addNodeManual(6, 700, 500)
+  node7 = addNodeManual(7, 500, 500)
+  node8 = addNodeManual(8, 300, 500)
+  node9 = addNodeManual(9, 500, 300)
+
+  addEdgeManual(4, node1, node2)
+  addEdgeManual(8, node8, node1)
+  addEdgeManual(8, node2, node3)
+  addEdgeManual(7, node3, node4)
+  addEdgeManual(9, node4, node5)
+  addEdgeManual(10, node5, node6)
+  addEdgeManual(14, node4, node6)
+  addEdgeManual(4, node3, node6)
+  addEdgeManual(2, node6, node7)
+  addEdgeManual(6, node7, node9)
+  addEdgeManual(1, node7, node8)
+  addEdgeManual(7, node8, node9)
+  addEdgeManual(11, node2, node8)
+  addEdgeManual(2, node3, node9)
+
+}
+
 
 let nodes = new Set()
 let edges = new Map()
@@ -820,35 +978,6 @@ function setup() {
   inpButton.parent("sketchHolder")
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
-
-  node1 = addNodeManual(1, 100, 300)
-  node2 = addNodeManual(2, 300, 100)
-  node3 = addNodeManual(3, 500, 100)
-  node4 = addNodeManual(4, 700, 100)
-  node5 = addNodeManual(5, 900, 300)
-  node6 = addNodeManual(6, 700, 500)
-  node7 = addNodeManual(7, 500, 500)
-  node8 = addNodeManual(8, 300, 500)
-  node9 = addNodeManual(9, 500, 300)
-
-  addEdgeManual(4, node1, node2)
-  addEdgeManual(8, node8, node1)
-  addEdgeManual(8, node2, node3)
-  addEdgeManual(7, node3, node4)
-  addEdgeManual(9, node4, node5)
-  addEdgeManual(10, node5, node6)
-  addEdgeManual(14, node4, node6)
-  addEdgeManual(4, node3, node6)
-  addEdgeManual(2, node6, node7)
-  addEdgeManual(6, node7, node9)
-  addEdgeManual(1, node7, node8)
-  addEdgeManual(7, node8, node9)
-  addEdgeManual(11, node2, node8)
-  addEdgeManual(2, node3, node9)
-
-  graph.dijkstraSPT(node1)
-
-  //moveInputField(100,100)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -960,6 +1089,18 @@ function mousePressed() {
           console.log("HERE")
           statustext = "DFS: Running"
           graph.dfs(selectedNode)
+          break
+        }
+      }
+    }
+
+    else if(clickMode == "greedyColoring" && editingMode == false){
+      for(node of nodes){
+        selectedNode = node.clicked()
+        if(selectedNode != undefined){
+          console.log("HERE")
+          statusText = "Greedy Coloring: Running"
+          graph.greedyColoring(selectedNode)
           break
         }
       }
