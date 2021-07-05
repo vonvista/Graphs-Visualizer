@@ -264,12 +264,126 @@ class Graph {
 
   }
 
+  async kosarajuSCC() {
+    var stack = []
+    
+    var visited = {}
 
-  draw() {
+    for(let node of nodes){
+      if(!visited[node.value]){
+        await this.kosarajuFillOrder(node, visited, stack)
+      }
+    }
+    console.log(stack)
 
-    // for (const [key, value] of this.AdjList.entries()) {
-    //   key.draw()
-    // }
+    let gr = await this.getTranspose()
+
+    //console.log(gr)
+
+    visited = {}
+    console.log(visited)
+
+    while(stack.length != 0){
+      let i = stack.pop()
+      let SCC = new Set()
+      console.log("===========")
+      if(!visited[i.value]){
+        console.log(i.value)
+
+        SCC.add(i)
+
+        // i is solely there to connect the first and last edge for visualizer
+        await gr.kosarajuDFS(i, visited, SCC)
+
+        // color remaining uncolored edges on SCC
+        console.log(SCC)
+
+        for(let u of SCC){
+          for(let v of SCC){
+            if(edges.has(u.value + "," + v.value)) {
+              let edge = getEdge(u, v)
+              if(edge.color[0] == 255 && edge.color[1] == 255 && edge.color[2] == 255){
+                edge.changeFill(255,157,0)
+              }
+
+              if(edge.color[0] == 126 && edge.color[1] == 198 && edge.color[2] == 247){
+                edge.changeFill(255,157,0)
+              }
+              
+            }
+          }
+        }
+      }
+    }
+
+    //color !SCC edges with a blunt blue
+    for (const [nodes, edge] of edges.entries()) {
+      if(edge.color[0] == 255 && edge.color[1] == 255 && edge.color[2] == 255){
+        //edge.changeFill(42, 76, 102)
+      }
+
+      if(edge.color[0] == 126 && edge.color[1] == 198 && edge.color[2] == 247){
+        edge.changeFill(255, 255, 255)
+      }
+  }
+
+    
+  }
+
+  async kosarajuFillOrder(v, visited, stack){
+    visited[v.value] = true
+
+    await v.changeFill(32,98,149)
+
+    for(let i of this.AdjList.get(v)){
+
+      await edges.get(v.value + "," + i.value).changeFill(126, 198, 247)
+      
+      if(!visited[i.value]){
+        
+        await this.kosarajuFillOrder(i, visited, stack)
+      }
+    }
+
+    stack.push(v)
+    console.log(stack)
+    
+  }
+
+  async kosarajuDFS(v, visited, SCC){
+    visited[v.value] = true
+    await v.changeOutline(255,157,0)
+    await v.changeFill(126, 41, 41)
+
+    for(let i of this.AdjList.get(v)){
+      if(!visited[i.value]){
+        console.log(i.value)
+
+        SCC.add(i)
+        
+        await getEdge(i, v).changeFill(255,157,0)
+        await this.kosarajuDFS(i, visited, SCC)
+
+        
+      }
+    }
+  }
+
+
+  async getTranspose() {
+    let g = new Graph()
+
+    for (const [key, value] of this.AdjList.entries()) {
+      g.addVertex(key)
+    }
+
+
+    for (const [key, value] of this.AdjList.entries()) {
+      for(let adjNodes of value){
+        g.addEdge(adjNodes, key)
+      }
+    }
+    return g
   }
 }
 
@@ -556,6 +670,12 @@ function handleGreedyColoring() {
   resetColors()
 }
 
+function handleSCC() {
+  graph.kosarajuSCC()
+  statusText = "Running: Kosaraju's Strongly Connected Components"
+  resetColors()
+}
+
 function moveInputField(x, y) {
   inp.position(x ,y)
   inpButton.position(x + 80,y)
@@ -599,10 +719,15 @@ function resetColors() {
     node.fillColor = [28,42,53]
     node.outlineColor = [255,255,255]
   }
+
+  var statusText2 = ""
+  var statusText3 = ""
 }
 
 function getEdge(u,v) {
-  return(edges.get(u.value + "," + v.value))
+  if(edges.has(u.value + "," + v.value)) return(edges.get(u.value + "," + v.value))
+
+  return undefined
 }
 
 function addNodeManual(value, x, y){
@@ -648,6 +773,8 @@ let startnode = undefined, endnode = undefined
 var graph = new Graph()
 
 var statusText = "Standby"
+var statusText2 = ""
+var statusText3 = ""
 
 function setup() {
   //createCanvas(400, 400);
@@ -668,30 +795,56 @@ function setup() {
   inpButton.position(-500,-500)
   inpButton.mousePressed(nodeValueSet);
 
-  node1 = addNodeManual(1, 100, 300)
+  //Example for PST and MST
+
+  // node1 = addNodeManual(1, 100, 300)
+  // node2 = addNodeManual(2, 300, 100)
+  // node3 = addNodeManual(3, 500, 100)
+  // node4 = addNodeManual(4, 700, 100)
+  // node5 = addNodeManual(5, 900, 300)
+  // node6 = addNodeManual(6, 700, 500)
+  // node7 = addNodeManual(7, 500, 500)
+  // node8 = addNodeManual(8, 300, 500)
+  // node9 = addNodeManual(9, 500, 300)
+
+  // addEdgeManual(node1, node2)
+  // addEdgeManual(node8, node1)
+  // addEdgeManual(node2, node3)
+  // addEdgeManual(node3, node4)
+  // addEdgeManual(node4, node5)
+  // addEdgeManual(node5, node6)
+  // addEdgeManual(node4, node6)
+  // addEdgeManual(node3, node6)
+  // addEdgeManual(node6, node7)
+  // addEdgeManual(node7, node9)
+  // addEdgeManual(node7, node8)
+  // addEdgeManual(node8, node9)
+  // addEdgeManual(node2, node8)
+  // addEdgeManual(node3, node9)
+
+  //Example for SCC
+
+  node1 = addNodeManual(1, 100, 100)
   node2 = addNodeManual(2, 300, 100)
   node3 = addNodeManual(3, 500, 100)
-  node4 = addNodeManual(4, 700, 100)
-  node5 = addNodeManual(5, 900, 300)
-  node6 = addNodeManual(6, 700, 500)
-  node7 = addNodeManual(7, 500, 500)
-  node8 = addNodeManual(8, 300, 500)
-  node9 = addNodeManual(9, 500, 300)
+  node4 = addNodeManual(4, 100, 300)
+  node5 = addNodeManual(5, 500, 300)
+  node6 = addNodeManual(6, 300, 300)
+
+  // addEdgeManual(node1, node2)
+  // addEdgeManual(node2, node4)
+  // addEdgeManual(node4, node1)
+  // addEdgeManual(node2, node3)
+  // addEdgeManual(node3, node5)
 
   addEdgeManual(node1, node2)
-  addEdgeManual(node8, node1)
+  addEdgeManual(node2, node6)
+  addEdgeManual(node6, node4)
+  addEdgeManual(node4, node1)
   addEdgeManual(node2, node3)
-  addEdgeManual(node3, node4)
-  addEdgeManual(node4, node5)
-  addEdgeManual(node5, node6)
-  addEdgeManual(node4, node6)
-  addEdgeManual(node3, node6)
-  addEdgeManual(node6, node7)
-  addEdgeManual(node7, node9)
-  addEdgeManual(node7, node8)
-  addEdgeManual(node8, node9)
-  addEdgeManual(node2, node8)
-  addEdgeManual(node3, node9)
+  addEdgeManual(node3, node5)
+
+  graph.kosarajuSCC()
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -699,6 +852,13 @@ function setup() {
 
 function draw() {
   background(28, 42, 53);
+
+  fill(WHITE)
+  noStroke()
+  textAlign(LEFT, TOP)
+  text(statusText, 10, 10)
+  text(statusText2, 10, 30)
+  text(statusText3, 10, 50)
 
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
@@ -711,12 +871,6 @@ function draw() {
     node.draw()
   }
 
-  graph.draw()
-
-  fill(WHITE)
-  noStroke()
-  textAlign(LEFT, TOP)
-  text(statusText, 10, 10)
 
   //tempLine
   strokeWeight(1)
