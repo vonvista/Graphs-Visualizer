@@ -1,4 +1,4 @@
-const controlsHeight = document.getElementById("controlPanel").offsetHeight 
+var controlsHeight = document.getElementById("controlMain").offsetHeight 
 
 var animSpeed = 4
 const easing = 0.05 * animSpeed
@@ -855,7 +855,7 @@ var statusText3 = ""
 
 function setup() {
   //createCanvas(400, 400);
-  let cnv = createCanvas(windowWidth, windowHeight - controlsHeight * 2);
+  let cnv = createCanvas(windowWidth, windowHeight - controlsHeight);
   cnv.parent("sketchHolder");
   console.log(cnv)
 
@@ -1106,5 +1106,6 @@ function mouseReleased(){
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight - controlsHeight * 2);
+  controlsHeight = document.getElementById("controlMain").offsetHeight 
+  resizeCanvas(windowWidth, windowHeight - controlsHeight)
 }
