@@ -971,7 +971,7 @@ function setup() {
   rectMode(CENTER)
   textAlign(CENTER, CENTER)
 
-  pixelDensity(displayDensity())
+  pixelDensity(1)
 }
 
 function draw() {
