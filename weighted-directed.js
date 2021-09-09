@@ -100,7 +100,6 @@ class Graph {
       // passing the current vertex to callback funtion
       console.log(getQueueElement.value);
       await getQueueElement.changeFill(32,98,149)
-
       // get the adjacent list for current vertex
       var get_List = this.AdjList.get(getQueueElement);
 
